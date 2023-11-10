@@ -3,6 +3,7 @@ use raylib::core::RaylibHandle;
 
 const LINE_WIDTH: i32 = 15;
 const TILE_SIZE: i32 = 40;
+const TILE_SIZE_F: f32 = TILE_SIZE as f32;
 const MAPH: usize = LINE_WIDTH as usize;
 const MAPL: usize = LINE_WIDTH as usize;
 
@@ -98,6 +99,65 @@ fn update_2d_player(rl: &mut RaylibHandle, player: &mut Player) {
     }
 }
 
+fn step_ray(d: &mut RaylibDrawHandle, position: Vector2, forward: Vector2,
+            step_count: i32, step_length: f32, incr: &mut i32, color: Color,
+            p_hit: &mut Vector2) {
+    let start = Vector2 { 
+        x: position.x,
+        y: position.y,
+    };
+
+    let end = Vector2 { 
+        x: position.x + forward.x/step_length,
+        y: position.y + forward.y/step_length,
+    };
+
+    p_hit.x = end.x;
+    p_hit.y = end.y;
+
+    d.draw_line(f32::round(start.x * TILE_SIZE_F  + TILE_SIZE_F/2.0) as i32,
+                f32::round(start.y * TILE_SIZE_F  + TILE_SIZE_F/2.0) as i32,
+                f32::round(end.x * TILE_SIZE_F  + TILE_SIZE_F/2.0) as i32,
+                f32::round(end.y * TILE_SIZE_F  + TILE_SIZE_F/2.0) as i32,
+                Color::GRAY);
+
+    if !hit(MAP, end, 0.5) && *incr < step_count {
+        *incr += 1;
+        step_ray(d, end, forward, step_count, step_length, incr, color, p_hit);
+    } else {
+        *incr = 0;
+    }
+}
+
+fn dist(v1: Vector2, v2: Vector2) -> f32 {
+   return (v1.x - v2.x).powf(2.0) + (v1.y - v2.y).powf(2.0);
+}
+
+fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: f32,
+              fov: i32) {
+    use std::f32::consts::PI;
+    for i in -fov/2..fov/2 {
+        let mut incr: i32 = 0;
+        let mut hit = Vector2{x: 0.0, y: 0.0};
+        let dir = Vector2 { 
+            x: f32::sin((cam_rotation + i as f32) * (PI/180.0)),
+            y: f32::cos((cam_rotation + i as f32) * (PI/180.0))
+        };
+
+        step_ray(d, cam_position, dir, 1000, 100.0, &mut incr, Color::GRAY, &mut hit);
+
+        let distance = dist(cam_position, hit);
+
+        d.draw_rectangle(
+            i * LINE_WIDTH + (LINE_WIDTH * fov/2) + (15*TILE_SIZE),
+            f32::round((5*TILE_SIZE) as f32 - ((1000.0/distance)/2.0)) as i32,
+            LINE_WIDTH,
+            (1000.0/distance) as i32,
+            Color::BROWN);
+    }
+}
+
+
 fn main() {
     let window_length: i32 = LINE_WIDTH*TILE_SIZE;
     let window_width: i32 = window_length + (LINE_WIDTH * 60);
@@ -127,5 +187,6 @@ fn main() {
         d.clear_background(Color::BLACK);
         render_2d_map(&mut d, MAP);
         render_2d_player(&mut d, player.position);
+        render_3d_map(&mut d, player.position, player.rotation as f32, 60);
     }
 }
