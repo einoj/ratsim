@@ -1,6 +1,8 @@
 use raylib::prelude::*;
 use raylib::core::RaylibHandle;
 
+use ::core::cmp::{min, max};
+
 const LINE_WIDTH: i32 = 15;
 const TILE_SIZE: i32 = 40;
 const TILE_SIZE_F: f32 = TILE_SIZE as f32;
@@ -49,12 +51,13 @@ fn render_2d_player(d: &mut RaylibDrawHandle, position: Vector2) {
 }
 
 fn hit(map: [[u8; MAPH]; MAPL], point: Vector2, size: f32) -> bool {
-    for row in 0..MAPH {
-        for col in 0..MAPL {
-            if (col as f32) < (point.x + size) &&
-               (col as f32 + size) > (point.x) &&
-               (row as f32) < (point.y + size) &&
-               (row as f32 + size) > point.y && map[row][col] == 1 {
+    let col_min = max(0,    (point.x - size).ceil()  as usize);
+    let col_max = min(MAPL, (point.x + size).floor() as usize + 1);
+    let row_min = max(0,    (point.y - size).ceil()  as usize);
+    let row_max = min(MAPH, (point.y + size).floor() as usize + 1);
+    for row in row_min..row_max {
+        for col in col_min..col_max {
+            if map[row][col] == 1 {
                 return true;
             }
         }
