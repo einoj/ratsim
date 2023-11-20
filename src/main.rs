@@ -123,6 +123,7 @@ fn dist(v1: Vector2, v2: Vector2) -> f32 {
 fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: f32,
               fov: i32) {
     use std::f32::consts::PI;
+    let column_width = 16;
     for i in -fov/2..fov/2 {
         let mut incr: i32 = 0;
         let mut hit = Vector2{x: 0.0, y: 0.0};
@@ -136,9 +137,9 @@ fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: 
         let distance = dist(cam_position, hit);
 
         d.draw_rectangle(
-            i * LINE_WIDTH + (LINE_WIDTH * fov/2) + (15*TILE_SIZE),
+            i * column_width + (column_width * fov/2) + (LINE_WIDTH*TILE_SIZE),
             f32::round((5*TILE_SIZE) as f32 - ((100.0/distance)/2.0)) as i32,
-            LINE_WIDTH,
+            column_width,
             (1000.0/distance) as i32,
             Color::BROWN);
     }
@@ -147,7 +148,7 @@ fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: 
 
 fn main() {
     let window_length: i32 = LINE_WIDTH*TILE_SIZE;
-    let window_width: i32 = window_length + (LINE_WIDTH * 60);
+    let window_width: i32 = window_length + (LINE_WIDTH * 30);
     
     let mut player = Player {
         position: Vector2::one(),
