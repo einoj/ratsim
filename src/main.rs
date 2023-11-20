@@ -1,32 +1,16 @@
 use raylib::prelude::*;
 use raylib::core::RaylibHandle;
+mod maze;
 
 use ::core::cmp::{min, max};
 
-const LINE_WIDTH: i32 = 15;
-const TILE_SIZE: i32 = 40;
+const LINE_WIDTH: i32 = maze::LINE_WIDTH;
+const TILE_SIZE: i32 = 20;
 const TILE_SIZE_F: f32 = TILE_SIZE as f32;
-const MAPH: usize = LINE_WIDTH as usize;
-const MAPL: usize = LINE_WIDTH as usize;
+const MAPH: usize = maze::MAPH;
+const MAPL: usize = maze::MAPL;
 
-const MAP: [[u8; MAPH]; MAPL] = [
-    [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1 ],
-    [ 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1 ],
-    [ 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1 ],
-    [ 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1 ],
-    [ 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1 ],
-    [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-    [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-];
-
+const MAP: [[u8; MAPH]; MAPL] = maze::generate_maze();
 struct Player {
     position: Vector2,
     rotation: i32
@@ -153,7 +137,7 @@ fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: 
 
         d.draw_rectangle(
             i * LINE_WIDTH + (LINE_WIDTH * fov/2) + (15*TILE_SIZE),
-            f32::round((5*TILE_SIZE) as f32 - ((1000.0/distance)/2.0)) as i32,
+            f32::round((5*TILE_SIZE) as f32 - ((100.0/distance)/2.0)) as i32,
             LINE_WIDTH,
             (1000.0/distance) as i32,
             Color::BROWN);
