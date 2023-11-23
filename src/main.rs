@@ -10,7 +10,6 @@ const TILE_SIZE_F: f32 = TILE_SIZE as f32;
 const MAPH: usize = maze::MAPH;
 const MAPL: usize = maze::MAPL;
 
-const MAP: [[u8; MAPH]; MAPL] = maze::generate_maze();
 struct Player {
     position: Vector2,
     rotation: i32
@@ -49,7 +48,7 @@ fn hit(map: [[u8; MAPH]; MAPL], point: Vector2, size: f32) -> bool {
     return false;
 }
 
-fn update_2d_player(rl: &mut RaylibHandle, player: &mut Player) {
+fn update_2d_player(rl: &mut RaylibHandle, player: &mut Player, map: [[u8; MAPH]; MAPL]) {
     use raylib::consts::KeyboardKey::*;
     use std::f32::consts::PI;
     let forward = Vector2 {
@@ -77,7 +76,7 @@ fn update_2d_player(rl: &mut RaylibHandle, player: &mut Player) {
     }
 
     
-    if !hit(MAP, Vector2 { 
+    if !hit(map, Vector2 { 
         x: player.position.x + velocity.x,
         y: player.position.y + velocity.y },
         0.5) {
@@ -88,7 +87,7 @@ fn update_2d_player(rl: &mut RaylibHandle, player: &mut Player) {
 
 fn step_ray(d: &mut RaylibDrawHandle, position: Vector2, forward: Vector2,
             step_count: i32, step_length: f32, incr: &mut i32, color: Color,
-            p_hit: &mut Vector2) {
+            p_hit: &mut Vector2, map: [[u8; MAPH]; MAPL]) {
     let start = Vector2 { 
         x: position.x,
         y: position.y,
@@ -108,9 +107,9 @@ fn step_ray(d: &mut RaylibDrawHandle, position: Vector2, forward: Vector2,
                 f32::round(end.y * TILE_SIZE_F  + TILE_SIZE_F/2.0) as i32,
                 Color::GRAY);
 
-    if !hit(MAP, end, 0.5) && *incr < step_count {
+    if !hit(map, end, 0.5) && *incr < step_count {
         *incr += 1;
-        step_ray(d, end, forward, step_count, step_length, incr, color, p_hit);
+        step_ray(d, end, forward, step_count, step_length, incr, color, p_hit, map);
     } else {
         *incr = 0;
     }
@@ -121,7 +120,7 @@ fn dist(v1: Vector2, v2: Vector2) -> f32 {
 }
 
 fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: f32,
-              fov: i32) {
+              fov: i32, map: [[u8; MAPH]; MAPL]) {
     use std::f32::consts::PI;
     let column_width = 16;
     for i in -fov/2..fov/2 {
@@ -132,7 +131,7 @@ fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: 
             y: f32::cos((cam_rotation + i as f32) * (PI/180.0))
         };
 
-        step_ray(d, cam_position, dir, 1000, 100.0, &mut incr, Color::GRAY, &mut hit);
+        step_ray(d, cam_position, dir, 1000, 100.0, &mut incr, Color::GRAY, &mut hit, map);
 
         let distance = dist(cam_position, hit);
 
@@ -149,6 +148,7 @@ fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: 
 fn main() {
     let window_length: i32 = LINE_WIDTH*TILE_SIZE;
     let window_width: i32 = window_length + (LINE_WIDTH * 30);
+    let map: [[u8; MAPH]; MAPL] = maze::generate_maze();
     
     let mut player = Player {
         position: Vector2::one(),
@@ -167,14 +167,14 @@ fn main() {
         let now = rl.get_time();
         if now - lasttime > 1.0/150.0 {
             lasttime = now;
-            update_2d_player(&mut rl, &mut player);
+            update_2d_player(&mut rl, &mut player, map);
         }
 
         let mut d = rl.begin_drawing(&thread);
          
         d.clear_background(Color::BLACK);
-        render_2d_map(&mut d, MAP);
+        render_2d_map(&mut d, map);
         render_2d_player(&mut d, player.position);
-        render_3d_map(&mut d, player.position, player.rotation as f32, 60);
+        render_3d_map(&mut d, player.position, player.rotation as f32, 60, map);
     }
 }
