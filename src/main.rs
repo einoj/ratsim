@@ -147,7 +147,7 @@ fn render_3d_map(d: &mut RaylibDrawHandle, cam_position: Vector2, cam_rotation: 
 
 fn main() {
     let window_length: i32 = LINE_WIDTH*TILE_SIZE;
-    let window_width: i32 = window_length + (LINE_WIDTH * 30);
+    let window_width: i32 = window_length + (LINE_WIDTH-1) * 30;
     let map: [[u8; MAPH]; MAPL] = maze::generate_maze();
     
     let mut player = Player {
