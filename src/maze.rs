@@ -19,7 +19,7 @@ fn binary_tree() -> [[u8; MAPH]; MAPL] {
                 continue;
             }
             if i == MAPL - 2 {
-                // dig west
+                // dig east
                 map[i][j+1] = 0;
                 continue;
             }
@@ -33,12 +33,46 @@ fn binary_tree() -> [[u8; MAPH]; MAPL] {
                 map[i+1][j] = 0;
             } else {
                 map[i][j+1] = 0;
-                //dig south
             }
         }
     }
     return map;
 }
+
+fn sidewinder() -> [[u8; MAPH]; MAPL] {
+    // Binary tree algorithim starting in the north west corner
+    // and generating a maze down and to the east.
+    let mut map = [[1; MAPL]; MAPH];
+
+    for i in (1..MAPL-1).step_by(2) {
+        for j in (1..MAPH-1).step_by(2) {
+            map[i][j] = 0;
+            if i == MAPL - 2 &&  j == MAPH -2 {
+                continue;
+            }
+            if i == MAPL - 2 {
+                // dig east
+                map[i][j+1] = 0;
+                continue;
+            }
+            if j == MAPH - 2 {
+                //dig south
+                map[i+1][j] = 0;
+                continue;
+            }
+            if rand::random::<bool>() {
+                // dig east
+                map[i][j+1] = 0;
+            } else {
+                let random_column = rand::thread_rng().gen_range(0..j);
+                //dig south at random column in run
+                map[i+1][random_column] = 0;
+            }
+        }
+    }
+    return map;
+}
+
 
 
 fn print_maze(maze: [[u8; MAPH]; MAPL]) {
@@ -67,7 +101,7 @@ pub fn generate_maze() -> [[u8; MAPH]; MAPL] {
     //map[17][16]= 0;
     //map[17][17]= 0;
     //map = dfs(curr_loc, &mut visited, map);
-    map = binary_tree();
+    map = sidewinder();
     print_maze(map);
 
     return map;
