@@ -1,6 +1,7 @@
 use rand::prelude::*;
-pub const LINE_WIDTH: i32 = 33; // Maze size needs to be odd because the binary tree generator
-                                // steps by 2.
+pub const LINE_WIDTH: i32 = 33; // Maze matrix size needs to be odd, because the maze matrix is
+                                // basically an alternating row/col of wall then path then wall,
+                                // and you need two walls to contain every path
 pub const MAPH: usize = LINE_WIDTH as usize;
 pub const MAPL: usize = LINE_WIDTH as usize;
 #[derive(Copy, Clone)]
