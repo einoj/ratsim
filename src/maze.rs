@@ -44,7 +44,21 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
     // and generating a maze down and to the east.
     let mut map = [[1; MAPL]; MAPH];
 
+    fn close_run(runstart_col: &mut usize, curr_row: usize, curr_col: usize, mut map: [[u8; MAPH]; MAPL]) -> [[u8; MAPH]; MAPL] {
+        let random_column =
+        if *runstart_col == curr_col {
+            *runstart_col
+        } else {
+            rand::thread_rng().gen_range(*runstart_col..curr_col)
+        };
+        //dig south at random column in run
+        map[curr_row+1][random_column] = 0;
+        *runstart_col = curr_col+2;
+        return map;
+    }
+
     for i in (1..MAPL-1).step_by(2) {
+        let mut runstart_col = 1;
         for j in (1..MAPH-1).step_by(2) {
             map[i][j] = 0;
             if i == MAPL - 2 &&  j == MAPH -2 {
@@ -55,19 +69,17 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
                 map[i][j+1] = 0;
                 continue;
             }
-            if j == MAPH - 2 {
-                //dig south
-                map[i+1][j] = 0;
-                continue;
-            }
             if rand::random::<bool>() {
-                // dig east
-                map[i][j+1] = 0;
+                if j == MAPH-2 {
+                    map = close_run(&mut runstart_col, i, j, map);
+                } else {
+                    // dig east
+                    map[i][j+1] = 0;
+                }
             } else {
-                let random_column = rand::thread_rng().gen_range(0..j);
-                //dig south at random column in run
-                map[i+1][random_column] = 0;
+                map = close_run(&mut runstart_col, i, j, map);
             }
+            print_maze(map);
         }
     }
     return map;
@@ -86,6 +98,7 @@ fn print_maze(maze: [[u8; MAPH]; MAPL]) {
         }
         println!("");
     }
+        println!("");
 }
 
 pub fn generate_maze() -> [[u8; MAPH]; MAPL] {
