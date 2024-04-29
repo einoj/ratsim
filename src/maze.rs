@@ -44,7 +44,7 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
     // and generating a maze down and to the east.
     let mut map = [[1; MAPL]; MAPH];
 
-    fn close_run(runstart_col: &mut usize, curr_row: usize, curr_col: usize, mut map: [[u8; MAPH]; MAPL]) -> [[u8; MAPH]; MAPL] {
+    fn close_run(runstart_col: &mut usize, curr_row: usize, curr_col: usize, map: &mut [[u8; MAPH]; MAPL]) {
         let random_column =
         if *runstart_col == curr_col {
             *runstart_col
@@ -54,7 +54,6 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
         //dig south at random column in run
         map[curr_row+1][random_column] = 0;
         *runstart_col = curr_col+2;
-        return map;
     }
 
     for i in (1..MAPL-1).step_by(2) {
@@ -71,13 +70,13 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
             }
             if rand::random::<bool>() {
                 if j == MAPH-2 {
-                    map = close_run(&mut runstart_col, i, j, map);
+                    close_run(&mut runstart_col, i, j, &mut map);
                 } else {
                     // dig east
                     map[i][j+1] = 0;
                 }
             } else {
-                map = close_run(&mut runstart_col, i, j, map);
+                close_run(&mut runstart_col, i, j, &mut map);
             }
         }
     }
