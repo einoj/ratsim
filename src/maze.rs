@@ -4,8 +4,6 @@ pub const LINE_WIDTH: i32 = 33; // Maze matrix size needs to be odd, because the
                                 // and you need two walls to contain every path
 pub const MAPH: usize = LINE_WIDTH as usize;
 pub const MAPL: usize = LINE_WIDTH as usize;
-#[derive(Copy, Clone)]
-struct Location {row: i16, col: i16}
 
 fn binary_tree() -> [[u8; MAPH]; MAPL] {
     // Binary tree algorithim starting in the north west corner
@@ -100,19 +98,7 @@ fn print_maze(maze: [[u8; MAPH]; MAPL]) {
 }
 
 pub fn generate_maze() -> [[u8; MAPH]; MAPL] {
-    let mut map = [[1; MAPL]; MAPH];
-    let mut visited = [[0 as u8; MAPL]; MAPH];
-    let curr_loc = Location{row: 1, col: 1};
-    //set up initial cell
-    map[curr_loc.row as usize][curr_loc.col as usize]= 0;
-
-    // setup goal
-    //map[16][16]= 0;
-    //map[16][17]= 0;
-    //map[17][16]= 0;
-    //map[17][17]= 0;
-    //map = dfs(curr_loc, &mut visited, map);
-    map = sidewinder();
+    let map = sidewinder();
     print_maze(map);
 
     return map;
