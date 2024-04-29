@@ -49,7 +49,7 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
         if *runstart_col == curr_col {
             *runstart_col
         } else {
-            rand::thread_rng().gen_range(*runstart_col..curr_col)
+            rand::thread_rng().gen_range(*runstart_col/2..curr_col/2)*2+1
         };
         //dig south at random column in run
         map[curr_row+1][random_column] = 0;
@@ -79,7 +79,6 @@ fn sidewinder() -> [[u8; MAPH]; MAPL] {
             } else {
                 map = close_run(&mut runstart_col, i, j, map);
             }
-            print_maze(map);
         }
     }
     return map;
